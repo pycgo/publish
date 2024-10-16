@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Selection Form</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: left;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 800px;
+        }
+        h1 {
+            color: #333333;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.5); /* 增大复选框大小 */
+            vertical-align: middle; /* 垂直居中 */
+            font-size: 30px;
+        }
+        input[type=""]:hover {
+            background-color: #0056b3;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            color: green;
+            font-size: 18px;
+        }
+    </style>
+    <script>
+        function toggleAllCheckboxes(e) {
+            const checkboxes = document.getElementsByName('options[]');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+        }
+
+        function sendSelections() {
+            const checkboxes = document.getElementsByName('options[]');
+            let selectedOptions = [];
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedOptions.push(checkbox.value);
+                }
+            });
+
+            fetch('http://127.0.0.1:8080/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ options: selectedOptions }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('result').innerText = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = `An error occurred: ${error.message}`;
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>B端测试 应用部署</h1>
+        <form onsubmit="event.preventDefault(); sendSelections();">
+            <label>
+                <input type="checkbox" onclick="toggleAllCheckboxes(event)">
+                全选 / 全不选
+            </label><br>
+            <input type="checkbox" name="options[]" value="bff"> bff<br><br>
+            <input type="checkbox" name="options[]" value="flow"> flow<br><br>
+            <input type="checkbox" name="options[]" value="gateway"> gateway<br><br>
+            <input type="checkbox" name="options[]" value="insight"> insight<br><br>
+            <input type="checkbox" name="options[]" value="link"> link<br><br>
+            <input type="checkbox" name="options[]" value="linkflow"> linkflow<br><br>
+            <input type="checkbox" name="options[]" value="rocket"> rocket<br><br>
+            <input type="checkbox" name="options[]" value="tms"> tms<br><br>
+            <input type="checkbox" name="options[]" value="tms-ui"> tms-ui<br><br>
+            <input type="checkbox" name="options[]" value="ui-dock"> ui-dock<br><br>
+            <input type="checkbox" name="options[]" value="upgrade"> upgrade<br><br>
+            <input type="submit" value="部署">
+        </form>
+
+        <!-- Result will be displayed here -->
+        <div id="result"></div>
+    </div>
+</body>
+</html>
